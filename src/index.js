@@ -2,7 +2,8 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const bcrypt = require('bcrypt');
-const collection = require("./mongodb"); // Assuming this is a valid MongoDB connection
+const mongoose = require("mongoose");  // Moving this up for clarity
+const collection = require("./mongodb"); // MongoDB connection and model import
 
 const templatePath = path.join(__dirname, '../templates');
 const publicPath = path.join(__dirname, '../public');
@@ -24,8 +25,12 @@ app.get("/signup", (req, res) => {
     res.sendFile(path.join(templatePath, 'signup.html')); // Send signup.html file
 });
 
+// POST /signup route
 app.post("/signup", async (req, res) => {
     try {
+        // Logging the incoming request body for debugging
+        console.log("Signup request body:", req.body);
+
         // Hash the user's password
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
@@ -48,10 +53,12 @@ app.post("/signup", async (req, res) => {
     }
 });
 
-
-
+// POST /login route
 app.post("/login", async (req, res) => {
     try {
+        // Logging the incoming request body for debugging
+        console.log("Login request body:", req.body);
+
         const user = await collection.findOne({ name: req.body.name });
 
         if (user) {
