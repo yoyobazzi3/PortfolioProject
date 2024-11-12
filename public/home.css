@@ -1,0 +1,83 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+}
+
+.container {
+    background: #222;
+    color: #fff;
+    background-size: cover;
+    background-position: center;
+    /* max-width: 450px; */
+    height: 100vh;
+    margin: auto;
+    position: relative;
+}
+#textBox{
+    position:absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    color:#fff;
+    padding: 10px;
+}
+#prevText{
+    position: absolute;
+    left:50%;
+    bottom:30%;
+    transform:translateX(-50%);
+    width: 90%;
+    font-size:32px ;
+    text-align:center;
+    text-shadow: 2px 2px 20px #000;
+}
+.upload-icon{
+    position: absolute;
+    width:60px;
+    bottom:100px;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor:pointer;
+}
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+    z-index: 1000;
+}
+
+.navbar ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+}
+
+.navbar ul li {
+    margin: 0 15px;
+}
+
+.navbar ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.navbar ul li a:hover {
+    text-decoration: underline;
+}
+
+/* Adjust the container to have some margin-top to avoid overlap with navbar */
+.container {
+    margin-top: 60px; /* Adjust this based on the height of your navbar */
+}

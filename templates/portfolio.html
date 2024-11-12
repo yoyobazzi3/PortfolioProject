@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio</title>
+    <link rel="stylesheet" href="home.css">
+</head>
+<body>
+    <nav class="navbar">
+        <ul>
+            <li><a href="portfolio">Home</a></li>
+            <li><a href="about">About</a></li>
+            <li><a href="resume.html">Resume</a></li>
+        </ul>
+    </nav>
+
+    <div class="container" id="imgBox">
+        <div id="prevText"></div>
+        <textarea id="textBox" placeholder="Add Caption"></textarea>
+        <img id="profileImage" src="" alt="Profile Image" style="display: none;" class="profile-image">
+
+        <input type="file" accept="image/*" name="image" id="file" onchange="updateImage(event)">
+        <label for="file"><img src="images/upload.png" class="upload-icon"></label>
+        
+        <button id="saveButton">Save</button>
+    </div>
+
+    <script>
+        const textBox = document.getElementById("textBox");
+        const prevText = document.getElementById("prevText");
+        const saveButton = document.getElementById("saveButton");
+        const fileInput = document.getElementById("file");
+        const profileImage = document.getElementById("profileImage");
+
+        // Real-time display of textarea content in prevText div
+        textBox.addEventListener("input", () => {
+            prevText.innerText = textBox.value;
+        });
+
+        // Load user data if username is in the query parameter
+        const queryParams = new URLSearchParams(window.location.search);
+        const username = queryParams.get('name');
+
+        if (username) {
+            // Fetch user data from the server
+            fetch(`/api/userdata?name=${username}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error(data.error);
+                    } else {
+                        // Display the user's saved caption and image if available
+                        prevText.innerText = data.caption;
+                        textBox.value = data.caption;
+
+                        if (data.profileFile) {
+                            profileImage.src = `/uploads/${data.profileFile}`;
+                            profileImage.style.display = 'block';
+                        }
+                    }
+                })
+                .catch(error => console.error('Error fetching user data:', error));
+        }
+
+        // Update displayed image immediately when a new file is selected
+        function updateImage(event) {
+            if (event.target.files.length > 0) {
+                const selectedFile = event.target.files[0];
+                profileImage.src = URL.createObjectURL(selectedFile);
+                profileImage.style.display = 'block'; // Show the image
+            }
+        }
+
+        // Save button click handler
+        saveButton.addEventListener("click", () => {
+            const formData = new FormData();
+            formData.append("username", username);
+            formData.append("caption", textBox.value);
+
+            // Only include the file if a new one was selected
+            if (fileInput.files.length > 0) {
+                formData.append("profileFile", fileInput.files[0]);
+            }
+
+            // Send data to the server
+            fetch('/api/save', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Your changes have been saved!");
+                } else {
+                    console.error("Error saving data:", data.error);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>

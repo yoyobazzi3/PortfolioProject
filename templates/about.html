@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About</title>
+    <link rel="stylesheet" href="home.css">
+</head>
+<body>
+    <nav class="navbar">
+        <ul>
+            <!-- Updated links to match URLs in index.js -->
+            <li><a href="portfolio?name={{username}}">Home</a></li>
+            <li><a href="about?name={{username}}">About</a></li>
+            <li><a href="resume.html?name={{username}}">Resume</a></li>
+        </ul>
+    </nav>
+
+    <div class="container" id="aboutContainer">
+        <h2>About Me</h2>
+        <textarea id="summaryText" placeholder="Write a brief summary about yourself..."></textarea>
+        
+        <h3>Career Timeline</h3>
+        <div id="timelineInput">
+            <input type="date" id="jobDate" placeholder="Date">
+            <input type="text" id="jobTitle" placeholder="Job Title">
+            <textarea id="jobDescription" placeholder="Job Description"></textarea>
+            <button id="addJobButton">Add Job</button>
+        </div>
+        
+        <div id="timelineDisplay"></div>
+        <button id="saveButton">Save</button>
+    </div>
+
+    <script>
+        const summaryText = document.getElementById("summaryText");
+        const jobDate = document.getElementById("jobDate");
+        const jobTitle = document.getElementById("jobTitle");
+        const jobDescription = document.getElementById("jobDescription");
+        const addJobButton = document.getElementById("addJobButton");
+        const timelineDisplay = document.getElementById("timelineDisplay");
+        const saveButton = document.getElementById("saveButton");
+
+        let timelineEntries = [];
+
+        // Function to display the timeline entries on the screen
+        function renderTimeline() {
+            timelineDisplay.innerHTML = "";
+            timelineEntries.forEach(entry => {
+                const entryDiv = document.createElement("div");
+                entryDiv.classList.add("timeline-entry");
+                entryDiv.innerHTML = `
+                    <strong>${entry.date} - ${entry.title}</strong><br>
+                    <p>${entry.description}</p>
+                `;
+                timelineDisplay.appendChild(entryDiv);
+            });
+        }
+
+        // Load user data if username is in the query parameter
+        const queryParams = new URLSearchParams(window.location.search);
+        const username = queryParams.get('name');
+
+        if (username) {
+            // Fetch user data from the server
+            fetch(`/api/userabout?name=${username}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error(data.error);
+                    } else {
+                        // Display the user's saved summary and timeline if available
+                        summaryText.value = data.summary || '';
+                        timelineEntries = data.timeline || [];
+                        renderTimeline();
+                    }
+                })
+                .catch(error => console.error('Error fetching user data:', error));
+        }
+
+        // Add job entry to the timeline
+        addJobButton.addEventListener("click", () => {
+            const newEntry = {
+                date: jobDate.value,
+                title: jobTitle.value,
+                description: jobDescription.value
+            };
+            timelineEntries.push(newEntry);
+            renderTimeline();
+
+            // Clear the input fields
+            jobDate.value = '';
+            jobTitle.value = '';
+            jobDescription.value = '';
+        });
+
+        // Save button click handler
+        saveButton.addEventListener("click", () => {
+            const formData = new FormData();
+            formData.append("username", username);
+            formData.append("summary", summaryText.value);
+            formData.append("timeline", JSON.stringify(timelineEntries));
+
+            // Send data to the server
+            fetch('/api/saveabout', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Your changes have been saved!");
+                } else {
+                    console.error("Error saving data:", data.error);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>

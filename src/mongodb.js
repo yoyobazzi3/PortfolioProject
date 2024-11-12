@@ -25,9 +25,24 @@ const LogInSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+    caption: {
+        type: String,
+        default: '' // Field to store the caption
+    },
+    profileFile: {
+        type: String,
+        default: '' // Field to store the uploaded file path
+    },
+    summary: {
+        type: String,
+        default: '' // Field to store the summary
+    },
+    timeline: {
+        type: String,
+        default: '' // Field to store the career timeline
     }
 });
 
-// Create the model and export it
 const collection = mongoose.model('Collection1', LogInSchema);
 module.exports = collection;
