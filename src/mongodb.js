@@ -12,7 +12,6 @@ mongoose.connect('mongodb://localhost:27017/PortfolioDB', {
     console.error('Failed to connect to MongoDB:', error);
 });
 
-// Define the schema
 const LogInSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -26,21 +25,27 @@ const LogInSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    caption: {
-        type: String,
-        default: '' // Field to store the caption
-    },
     profileFile: {
         type: String,
-        default: '' // Field to store the uploaded file path
+        default: ''
+    },
+    caption: {
+        type: String,
+        default: ''
     },
     summary: {
         type: String,
-        default: '' // Field to store the summary
+        default: ''
     },
     timeline: {
-        type: String,
-        default: '' // Field to store the career timeline
+        type: [
+            {
+                date: String, // Could also be Date if preferred
+                title: String,
+                description: String
+            }
+        ],
+        default: []
     }
 });
 
