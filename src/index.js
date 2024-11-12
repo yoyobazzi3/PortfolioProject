@@ -29,47 +29,35 @@ if (!fs.existsSync(dir)) {
 const templatePath = path.join(__dirname, '../templates'); // Path to your HTML templates
 const publicPath = path.join(__dirname, '../public'); // Path to your public directory
 
-// Serve static files from the public directory
+// Serve static files from the public and uploads directories
 app.use(express.static(publicPath));
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Middleware to parse JSON and URL-encoded requests
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Serve uploads folder statically
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
-
 // Routes
-app.get('/', (req, res) => {
-    res.sendFile(path.join(templatePath, 'login.html')); // Serve login page
-});
-
-app.get('/signup', (req, res) => {
-    res.sendFile(path.join(templatePath, 'signup.html')); // Serve signup page
-});
-
-app.get('/portfolio', (req, res) => {
-    res.sendFile(path.join(templatePath, 'portfolio.html')); // Serve portfolio page
-});
+app.get('/', (req, res) => res.sendFile(path.join(templatePath, 'login.html'))); // Serve login page
+app.get('/signup', (req, res) => res.sendFile(path.join(templatePath, 'signup.html'))); // Serve signup page
+app.get('/portfolio', (req, res) => res.sendFile(path.join(templatePath, 'portfolio.html'))); // Serve portfolio page
+app.get('/about', (req, res) => res.sendFile(path.join(templatePath, 'about.html'))); // Serve about page
 
 // POST /signup route
 app.post('/signup', upload.single('profileFile'), async (req, res) => {
     try {
-        console.log('Signup request body:', req.body);
-
-        // Hash the user's password
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
-        // Create the user data with the email, hashed password, and uploaded file
+        // Create user data with hashed password and profile file
         const data = {
             name: req.body.name,
             email: req.body.email,
             password: hashedPassword,
-            profileFile: req.file ? req.file.filename : null, // Save the filename in the database
-            caption: req.body.caption || '' // Save initial caption if provided
+            profileFile: req.file ? req.file.filename : null,
+            caption: req.body.caption || ''
         };
 
-        // Insert the user data into the MongoDB collection
+        // Insert user data into MongoDB
         await collection.insertMany([data]);
 
         // Redirect the user to the portfolio page
@@ -83,26 +71,13 @@ app.post('/signup', upload.single('profileFile'), async (req, res) => {
 // POST /login route
 app.post('/login', async (req, res) => {
     try {
-        console.log('Login request body:', req.body);
-
-        // Find the user by their name in MongoDB
+        // Find the user by their name
         const user = await collection.findOne({ name: req.body.name });
 
-        if (user) {
-            // Compare the plain-text password with the stored hashed password
-            const passwordMatch = await bcrypt.compare(req.body.password, user.password);
-
-            if (passwordMatch) {
-                // Redirect to portfolio.html with the username as a query parameter
-                res.redirect(`/portfolio?name=${user.name}`);
-            } else {
-                // If password doesn't match, redirect with error
-                console.log('Password mismatch');
-                res.redirect('/?error=true');
-            }
+        if (user && await bcrypt.compare(req.body.password, user.password)) {
+            res.redirect(`/portfolio?name=${user.name}`);
         } else {
-            // If user not found, redirect with error
-            console.log('User not found');
+            console.log('Invalid credentials');
             res.redirect('/?error=true');
         }
     } catch (error) {
@@ -114,20 +89,15 @@ app.post('/login', async (req, res) => {
 // POST /upload route for updating profile file and caption
 app.post('/upload', upload.single('profileFile'), async (req, res) => {
     try {
-        const username = req.body.username;
-
         const updateData = {
             profileFile: req.file ? req.file.filename : null,
-            caption: req.body.caption || '' // Save the caption
+            caption: req.body.caption || ''
         };
 
-        // Update the user in the database with the new file and caption
-        await collection.updateOne({ name: username }, { $set: updateData });
+        await collection.updateOne({ name: req.body.username }, { $set: updateData });
 
-        // Fetch the updated user data
-        const updatedUser = await collection.findOne({ name: username });
-
-        // Send updated user data as JSON
+        // Fetch and return the updated user data
+        const updatedUser = await collection.findOne({ name: req.body.username });
         res.json({
             name: updatedUser.name,
             profileFile: updatedUser.profileFile,
@@ -139,18 +109,14 @@ app.post('/upload', upload.single('profileFile'), async (req, res) => {
     }
 });
 
-// GET /api/userdata route to fetch user data for portfolio page
 app.get('/api/userdata', async (req, res) => {
     const username = req.query.name;
-    
     try {
         const user = await collection.findOne({ name: username });
-        
         if (user) {
             res.json({
-                name: user.name,
-                profileFile: user.profileFile,
-                caption: user.caption
+                caption: user.caption,
+                profileFile: user.profileFile
             });
         } else {
             res.status(404).json({ error: 'User not found' });
@@ -161,44 +127,13 @@ app.get('/api/userdata', async (req, res) => {
     }
 });
 
-// GET /about route
-app.get('/about', (req, res) => {
-    res.sendFile(path.join(templatePath, 'about.html')); // Serve the About page
-});
-app.get('/portfolio', (req, res) => {
-    res.sendFile(path.join(templatePath, 'about.html')); // Serve the About page
-});
-// POST /api/save route to save or update caption and profile image
-app.post('/api/save', upload.single('profileFile'), async (req, res) => {
-    try {
-        const username = req.body.username;
 
-        // Prepare data to update
-        const updateData = {
-            caption: req.body.caption || ''
-        };
-
-        // If a new profile image is uploaded, add it to the update data
-        if (req.file) {
-            updateData.profileFile = req.file.filename;
-        }
-
-        // Update the user record in MongoDB
-        await collection.updateOne({ name: username }, { $set: updateData });
-
-        res.json({ success: true });
-    } catch (error) {
-        console.error('Error saving data:', error);
-        res.status(500).json({ success: false, error: 'Error saving data' });
-    }
-});
-// GET /api/userabout route to fetch summary and timeline for the user
+// GET /api/userabout route to fetch about page data
 app.get('/api/userabout', async (req, res) => {
     const username = req.query.name;
     
     try {
         const user = await collection.findOne({ name: username });
-        
         if (user) {
             res.json({
                 summary: user.summary || '',
@@ -213,18 +148,34 @@ app.get('/api/userabout', async (req, res) => {
     }
 });
 
+// POST /api/save route to save or update portfolio caption and profile image
+app.post('/api/save', upload.single('profileFile'), async (req, res) => {
+    try {
+        const updateData = { caption: req.body.caption || '' };
+        if (req.file) {
+            updateData.profileFile = req.file.filename;
+        }
+
+        await collection.updateOne({ name: req.body.username }, { $set: updateData });
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error saving data:', error);
+        res.status(500).json({ success: false, error: 'Error saving data' });
+    }
+});
+
 // POST /api/saveabout route to save or update summary and timeline for the user
 app.post('/api/saveabout', async (req, res) => {
     try {
         const username = req.body.username;
 
-        // Parse the timeline as JSON
-        const timeline = JSON.parse(req.body.timeline);
+        // Parse the timeline as JSON array
+        const timeline = req.body.timeline ? JSON.parse(req.body.timeline) : [];
 
         // Prepare data to update
         const updateData = {
             summary: req.body.summary || '',
-            timeline: timeline || []
+            timeline: timeline
         };
 
         // Update the user record in MongoDB
@@ -236,6 +187,7 @@ app.post('/api/saveabout', async (req, res) => {
         res.status(500).json({ success: false, error: 'Error saving data' });
     }
 });
+
 
 // Start the server
 const port = 3000;

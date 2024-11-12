@@ -3,23 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About</title>
+    <title>About Me</title>
     <link rel="stylesheet" href="home.css">
 </head>
 <body>
     <nav class="navbar">
         <ul>
-            <!-- Updated links to match URLs in index.js -->
-            <li><a href="portfolio?name={{username}}">Home</a></li>
-            <li><a href="about?name={{username}}">About</a></li>
-            <li><a href="resume.html?name={{username}}">Resume</a></li>
+            <li><a href="#" id="homeLink">Home</a></li>
+            <li><a href="#" id="aboutLink">About</a></li>
+            <li><a href="#" id="resumeLink">Resume</a></li>
         </ul>
     </nav>
 
     <div class="container" id="aboutContainer">
         <h2>About Me</h2>
         <textarea id="summaryText" placeholder="Write a brief summary about yourself..."></textarea>
-        
+
         <h3>Career Timeline</h3>
         <div id="timelineInput">
             <input type="date" id="jobDate" placeholder="Date">
@@ -33,17 +32,38 @@
     </div>
 
     <script>
+        const queryParams = new URLSearchParams(window.location.search);
+        const username = queryParams.get('name');
+        
+        document.getElementById("homeLink").href = `portfolio?name=${username}`;
+        document.getElementById("aboutLink").href = `about?name=${username}`;
+        document.getElementById("resumeLink").href = `resume.html?name=${username}`;
+
         const summaryText = document.getElementById("summaryText");
         const jobDate = document.getElementById("jobDate");
         const jobTitle = document.getElementById("jobTitle");
         const jobDescription = document.getElementById("jobDescription");
-        const addJobButton = document.getElementById("addJobButton");
         const timelineDisplay = document.getElementById("timelineDisplay");
+        const addJobButton = document.getElementById("addJobButton");
         const saveButton = document.getElementById("saveButton");
 
         let timelineEntries = [];
 
-        // Function to display the timeline entries on the screen
+        // Load user-specific data on page load
+        if (username) {
+            fetch(`/api/userabout?name=${username}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.error) {
+                        summaryText.value = data.summary || '';
+                        timelineEntries = data.timeline || [];
+                        renderTimeline();
+                    }
+                })
+                .catch(error => console.error('Error fetching user data:', error));
+        }
+
+        // Render timeline entries on the page
         function renderTimeline() {
             timelineDisplay.innerHTML = "";
             timelineEntries.forEach(entry => {
@@ -57,27 +77,6 @@
             });
         }
 
-        // Load user data if username is in the query parameter
-        const queryParams = new URLSearchParams(window.location.search);
-        const username = queryParams.get('name');
-
-        if (username) {
-            // Fetch user data from the server
-            fetch(`/api/userabout?name=${username}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        console.error(data.error);
-                    } else {
-                        // Display the user's saved summary and timeline if available
-                        summaryText.value = data.summary || '';
-                        timelineEntries = data.timeline || [];
-                        renderTimeline();
-                    }
-                })
-                .catch(error => console.error('Error fetching user data:', error));
-        }
-
         // Add job entry to the timeline
         addJobButton.addEventListener("click", () => {
             const newEntry = {
@@ -88,23 +87,23 @@
             timelineEntries.push(newEntry);
             renderTimeline();
 
-            // Clear the input fields
             jobDate.value = '';
             jobTitle.value = '';
             jobDescription.value = '';
         });
 
-        // Save button click handler
+        // Save about data to the server
         saveButton.addEventListener("click", () => {
-            const formData = new FormData();
-            formData.append("username", username);
-            formData.append("summary", summaryText.value);
-            formData.append("timeline", JSON.stringify(timelineEntries));
+            const formData = {
+                username: username,
+                summary: summaryText.value,
+                timeline: JSON.stringify(timelineEntries)
+            };
 
-            // Send data to the server
             fetch('/api/saveabout', {
                 method: 'POST',
-                body: formData
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
             })
             .then(response => response.json())
             .then(data => {
