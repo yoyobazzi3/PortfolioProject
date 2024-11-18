@@ -1,0 +1,228 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif; /* Apply Poppins font globally */
+    box-sizing: border-box;
+}
+
+/* Navbar Styling */
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #333;
+    color: #fff;
+    z-index: 1000;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+/* Space below the navbar */
+body {
+    padding-top: 70px; /* Adjust this value to match the height of the navbar */
+}
+
+/* Navbar Links */
+.navbar ul {
+    list-style-type: none;
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+    margin: 0;
+}
+
+.navbar ul li {
+    margin: 0 15px;
+}
+
+.navbar ul li a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: 500; /* Slightly bolder font for navbar links */
+    transition: color 0.3s ease;
+}
+
+.navbar ul li a:hover {
+    color: #00bcd4;
+}
+
+/* About Me Container */
+#aboutContainer {
+    padding: 20px;
+    max-width: 800px;
+    margin: auto;
+    text-align: center;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Section Titles */
+h2, h3 {
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: 600; /* Add weight to titles for emphasis */
+}
+
+
+/* Summary Text Area */
+#summaryText {
+    width: 100%;
+    height: 100px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 16px;
+    outline: none;
+    resize: none;
+    margin-bottom: 20px;
+    transition: border-color 0.3s ease;
+}
+
+#summaryText:focus {
+    border-color: #00bcd4;
+}
+
+/* Displayed Summary */
+#summaryDisplay {
+    margin: 20px auto;
+    padding: 15px;
+    border: 2px solid #333;
+    border-radius: 5px;
+    background-color: #f1f1f1;
+    font-size: 16px;
+    color: #555;
+    font-style: italic;
+    text-align: left;
+    max-width: 700px;
+}
+
+/* Timeline Input */
+#timelineInput {
+    margin-top: 20px;
+    text-align: left;
+}
+
+#timelineInput input,
+#timelineInput textarea {
+    width: calc(100% - 20px);
+    margin: 10px 0;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    outline: none;
+    resize: none;
+    transition: border-color 0.3s ease;
+}
+
+#timelineInput input:focus,
+#timelineInput textarea:focus {
+    border-color: #00bcd4;
+}
+
+/* Add Job Button */
+#addJobButton {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#addJobButton:hover {
+    background-color: #00bcd4;
+}
+
+/* Timeline Display */
+#timelineDisplay {
+    margin: 20px 0;
+    position: relative;
+}
+
+#timelineDisplay::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 4px;
+    background-color: #ddd;
+    transform: translateX(-50%);
+    z-index: 1;
+}
+
+.timeline-entry {
+    position: relative;
+    width: 50%;
+    margin-bottom: 20px;
+    padding: 10px;
+    box-sizing: border-box;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    z-index: 2;
+}
+
+.timeline-entry:nth-child(odd) {
+    left: 0;
+    text-align: right;
+}
+
+.timeline-entry:nth-child(even) {
+    left: 50%;
+    text-align: left;
+}
+
+.timeline-entry strong {
+    display: block;
+    font-size: 1em;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.timeline-entry p {
+    margin: 0;
+    font-size: 0.9em;
+    color: #555;
+}
+
+.timeline-entry:nth-child(odd)::after,
+.timeline-entry:nth-child(even)::after {
+    content: '';
+    position: absolute;
+    top: 15px;
+    width: 12px;
+    height: 12px;
+    background-color: #00bcd4;
+    border-radius: 50%;
+    z-index: 2;
+}
+
+.timeline-entry:nth-child(odd)::after {
+    right: -6px;
+}
+
+.timeline-entry:nth-child(even)::after {
+    left: -6px;
+}
+
+/* Save Buttons */
+button {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #00bcd4;
+}

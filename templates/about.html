@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Me</title>
-    <link rel="stylesheet" href="home.css">
+    <link rel="stylesheet" href="about.css">
 </head>
 <body>
     <nav class="navbar">
@@ -17,34 +17,47 @@
 
     <div class="container" id="aboutContainer">
         <h2>About Me</h2>
+
+        <!-- Summary Section -->
         <textarea id="summaryText" placeholder="Write a brief summary about yourself..."></textarea>
+        <button id="saveSummaryButton">Save Summary</button>
 
         <h3>Career Timeline</h3>
+
+        <!-- Timeline Input -->
         <div id="timelineInput">
             <input type="date" id="jobDate" placeholder="Date">
             <input type="text" id="jobTitle" placeholder="Job Title">
             <textarea id="jobDescription" placeholder="Job Description"></textarea>
             <button id="addJobButton">Add Job</button>
         </div>
-        
-        <div id="timelineDisplay"></div>
-        <button id="saveButton">Save</button>
+        <div class = "export" id = "export">
+        <div id="summaryDisplay" class="display-section"></div>
+
+        <!-- Timeline Display -->
+        <div id="timelineDisplay" class="display-section"></div>
+        </div>
+        <button id="saveButton">Save All</button>
     </div>
 
     <script>
+        // Extract username from query parameters
         const queryParams = new URLSearchParams(window.location.search);
         const username = queryParams.get('name');
-        
+
+        // Update navbar links with username
         document.getElementById("homeLink").href = `portfolio?name=${username}`;
         document.getElementById("aboutLink").href = `about?name=${username}`;
         document.getElementById("resumeLink").href = `resume.html?name=${username}`;
 
         const summaryText = document.getElementById("summaryText");
+        const summaryDisplay = document.getElementById("summaryDisplay");
         const jobDate = document.getElementById("jobDate");
         const jobTitle = document.getElementById("jobTitle");
         const jobDescription = document.getElementById("jobDescription");
         const timelineDisplay = document.getElementById("timelineDisplay");
         const addJobButton = document.getElementById("addJobButton");
+        const saveSummaryButton = document.getElementById("saveSummaryButton");
         const saveButton = document.getElementById("saveButton");
 
         let timelineEntries = [];
@@ -55,7 +68,11 @@
                 .then(response => response.json())
                 .then(data => {
                     if (!data.error) {
+                        // Populate summary
                         summaryText.value = data.summary || '';
+                        summaryDisplay.innerText = data.summary || '';
+
+                        // Populate timeline
                         timelineEntries = data.timeline || [];
                         renderTimeline();
                     }
@@ -65,34 +82,65 @@
 
         // Render timeline entries on the page
         function renderTimeline() {
-            timelineDisplay.innerHTML = "";
-            timelineEntries.forEach(entry => {
+            timelineDisplay.innerHTML = ""; // Clear existing entries
+
+            timelineEntries.forEach((entry, index) => {
                 const entryDiv = document.createElement("div");
                 entryDiv.classList.add("timeline-entry");
+
+                // Add job details and delete button
                 entryDiv.innerHTML = `
                     <strong>${entry.date} - ${entry.title}</strong><br>
                     <p>${entry.description}</p>
+                    <button class="delete-job-button" data-index="${index}">Delete</button>
                 `;
+
+                // Append the job entry to the timeline display
                 timelineDisplay.appendChild(entryDiv);
+            });
+
+            // Attach event listeners to all delete buttons
+            const deleteButtons = document.querySelectorAll(".delete-job-button");
+            deleteButtons.forEach(button => {
+                button.addEventListener("click", event => {
+                    const index = parseInt(event.target.getAttribute("data-index"), 10);
+
+                    // Confirm deletion
+                    const confirmed = confirm("Are you sure you want to delete this job?");
+                    if (confirmed) {
+                        // Remove the entry from the timeline array
+                        timelineEntries.splice(index, 1);
+
+                        // Re-render the timeline
+                        renderTimeline();
+                    }
+                });
             });
         }
 
-        // Add job entry to the timeline
+        // Save Summary Button Handler
+        saveSummaryButton.addEventListener("click", () => {
+            summaryDisplay.innerText = summaryText.value;
+        });
+
+        // Add Job Entry to Timeline
         addJobButton.addEventListener("click", () => {
             const newEntry = {
                 date: jobDate.value,
                 title: jobTitle.value,
                 description: jobDescription.value
             };
+
             timelineEntries.push(newEntry);
             renderTimeline();
 
+            // Clear inputs
             jobDate.value = '';
             jobTitle.value = '';
             jobDescription.value = '';
         });
 
-        // Save about data to the server
+        // Save all data (summary and timeline)
         saveButton.addEventListener("click", () => {
             const formData = {
                 username: username,

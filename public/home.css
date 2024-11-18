@@ -1,74 +1,120 @@
-/* Navbar styling */
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+}
+
+/* Navbar Styling */
 .navbar {
     position: fixed;
     top: 0;
     width: 100%;
     background-color: #333;
     color: #fff;
-    text-align: center;
-    padding: 10px 0;
     z-index: 1000;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.5); /* Add subtle shadow for depth */
 }
 
 .navbar ul {
     list-style-type: none;
-    margin: 0;
-    padding: 0;
     display: flex;
     justify-content: center;
+    align-items: center;
+    padding: 10px 0;
+    margin: 0;
 }
 
 .navbar ul li {
-    margin: 0 15px;
+    margin: 0 20px; /* Consistent spacing between links */
 }
 
 .navbar ul li a {
-    color: #fff;
     text-decoration: none;
-    font-weight: bold;
+    color: #fff;
+    font-weight: 500; /* Medium font weight for readability */
+    font-size: 16px;
+    transition: all 0.3s ease; /* Smooth hover effect */
 }
 
 .navbar ul li a:hover {
+    color: #00bcd4; /* Highlighted color for hover state */
     text-decoration: underline;
 }
 
-/* Container styling */
+/* Container Styling */
 .container {
-    margin-top: 80px;
-    text-align: center;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 20px;
+    margin-top: 70px; /* Adjusted for navbar height */
+    height: 100vh;
+    background: #222;
+    color: #fff;
     background-size: cover;
     background-position: center;
-    border-radius: 10px;
-    border: 2px solid #ddd;
+    position: relative;
 }
 
-/* Caption Preview Styling */
-#prevText {
-    font-size: 18px;
-    color: #333;
-    margin-bottom: 15px;
-}
-
-/* Caption Textbox Styling */
+/* Text Area and Caption Styles */
 #textBox {
+    position: absolute;
+    left: 0;
+    bottom: 0;
     width: 100%;
-    height: 80px;
-    margin-top: 15px;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #fff;
     padding: 10px;
     font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
     resize: none;
-    font-family: Arial, sans-serif;
+    font-family: 'Poppins', sans-serif; /* Ensure font consistency */
 }
 
-/* Upload Icon Label Styling */
+#prevText {
+    position: absolute;
+    left: 50%;
+    bottom: 30%;
+    transform: translateX(-50%);
+    width: 90%;
+    font-size: 32px;
+    text-align: center;
+    text-shadow: 2px 2px 20px #000;
+    font-family: 'Poppins', sans-serif; /* Consistent font */
+}
+
+/* Upload Icon */
 .upload-icon {
-    width: 40px;
+    position: absolute;
+    width: 60px;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
     cursor: pointer;
-    margin-top: 10px;
+    transition: transform 0.2s ease, opacity 0.3s ease; /* Smooth animation */
+}
+
+.upload-icon:hover {
+    transform: translateX(-50%) scale(1.1); /* Slight zoom on hover */
+    opacity: 0.9; /* Add subtle transparency */
+}
+
+/* Save Button */
+.save-btn {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth hover effects */
+}
+
+.save-btn:hover {
+    background-color: #00bcd4; /* Highlight button on hover */
+    transform: translateX(-50%) scale(1.05); /* Slight zoom */
 }

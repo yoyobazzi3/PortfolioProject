@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portfolio</title>
     <link rel="stylesheet" href="home.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
     <nav class="navbar">
@@ -24,6 +26,8 @@
 
         <!-- Save button -->
         <button id="saveButton" class="save-btn">Save</button>
+        <!-- Export button -->
+        <button id="exportButton" class="save-btn">Export to PDF</button>
     </div>
 
     <script>
@@ -43,6 +47,7 @@
         const saveButton = document.getElementById("saveButton");
         const prevText = document.getElementById("prevText");
         const fileInput = document.getElementById("file");
+        const exportButton = document.getElementById("exportButton");
 
         // Display the typed caption in real-time
         textBox.addEventListener("input", () => {
@@ -100,6 +105,23 @@
                 }
             })
             .catch(error => console.error('Error:', error));
+        });
+
+        // Export button click handler to export the content as a PDF
+        exportButton.addEventListener("click", () => {
+            const { jsPDF } = window.jspdf;
+
+            // Capture the content of imgBox
+            html2canvas(imgBox).then(canvas => {
+                const pdf = new jsPDF();
+                const imgData = canvas.toDataURL("image/png");
+
+                // Add the image to the PDF
+                pdf.addImage(imgData, "PNG", 10, 10, 190, 0); // Adjust dimensions as needed
+                pdf.save("Portfolio.pdf"); // Download the PDF
+            }).catch(error => {
+                console.error('Error exporting to PDF:', error);
+            });
         });
     </script>
 </body>

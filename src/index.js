@@ -147,6 +147,20 @@ app.get('/api/userabout', async (req, res) => {
         res.status(500).json({ error: 'Error fetching user data' });
     }
 });
+app.post('/api/saveabout', async (req, res) => {
+    const { username, summary, timeline } = req.body;
+    try {
+        await collection.updateOne(
+            { name: username },
+            { $set: { summary, timeline: JSON.parse(timeline) } },
+            { upsert: true }
+        );
+        res.json({ success: true });
+    } catch (error) {
+        console.error('Error saving about data:', error);
+        res.status(500).json({ success: false, error: 'Error saving data' });
+    }
+});
 
 // POST /api/save route to save or update portfolio caption and profile image
 app.post('/api/save', upload.single('profileFile'), async (req, res) => {
