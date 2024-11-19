@@ -67,7 +67,6 @@
                     if (data.error) {
                         console.error(data.error);
                     } else {
-                        // Display saved caption and image, if available
                         if (data.caption) {
                             textBox.value = data.caption;
                             prevText.innerText = data.caption;
@@ -86,12 +85,10 @@
             formData.append("username", username);
             formData.append("caption", textBox.value);
 
-            // Add the file to form data if an image was selected
             if (fileInput.files.length > 0) {
                 formData.append("profileFile", fileInput.files[0]);
             }
 
-            // Send data to server to save
             fetch('/api/save', {
                 method: 'POST',
                 body: formData
@@ -111,14 +108,12 @@
         exportButton.addEventListener("click", () => {
             const { jsPDF } = window.jspdf;
 
-            // Capture the content of imgBox
             html2canvas(imgBox).then(canvas => {
                 const pdf = new jsPDF();
                 const imgData = canvas.toDataURL("image/png");
 
-                // Add the image to the PDF
-                pdf.addImage(imgData, "PNG", 10, 10, 190, 0); // Adjust dimensions as needed
-                pdf.save("Portfolio.pdf"); // Download the PDF
+                pdf.addImage(imgData, "PNG", 10, 10, 190, 0);
+                pdf.save("Portfolio.pdf");
             }).catch(error => {
                 console.error('Error exporting to PDF:', error);
             });

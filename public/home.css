@@ -98,10 +98,10 @@
     opacity: 0.9; /* Add subtle transparency */
 }
 
-/* Save Button */
+
 .save-btn {
     position: absolute;
-    bottom: 40px;
+    bottom: 80px; /* Increased from 40px to provide space */
     left: 50%;
     transform: translateX(-50%);
     background-color: #333;
@@ -111,10 +111,30 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth hover effects */
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .save-btn:hover {
-    background-color: #00bcd4; /* Highlight button on hover */
-    transform: translateX(-50%) scale(1.05); /* Slight zoom */
+    background-color: #00bcd4;
+    transform: translateX(-50%) scale(1.05);
+}
+
+#exportButton {
+    position: absolute;
+    bottom: 40px; /* Below the save button */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#exportButton:hover {
+    background-color: #00bcd4;
+    transform: translateX(-50%) scale(1.05);
 }
