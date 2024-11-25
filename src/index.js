@@ -40,6 +40,7 @@ app.use(express.urlencoded({ extended: false }));
 // Routes
 app.get('/', (req, res) => res.sendFile(path.join(templatePath, 'login.html'))); // Serve login page
 app.get('/signup', (req, res) => res.sendFile(path.join(templatePath, 'signup.html'))); // Serve signup page
+app.get('/login', (req, res) => res.sendFile(path.join(templatePath, 'login.html'))); // Serve signup page
 app.get('/portfolio', (req, res) => res.sendFile(path.join(templatePath, 'portfolio.html'))); // Serve portfolio page
 app.get('/about', (req, res) => res.sendFile(path.join(templatePath, 'about.html'))); // Serve about page
 
