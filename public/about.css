@@ -1,8 +1,16 @@
+/* Global Reset and Font Setup */
 * {
     margin: 0;
     padding: 0;
-    font-family: 'Poppins', sans-serif; /* Apply Poppins font globally */
+    font-family: 'Poppins', sans-serif;
     box-sizing: border-box;
+}
+
+body {
+    padding-top: 70px;
+    background-color: #f5f7fa;
+    color: #2d3748;
+    line-height: 1.6;
 }
 
 /* Navbar Styling */
@@ -10,136 +18,120 @@
     position: fixed;
     top: 0;
     width: 100%;
-    background-color: #333;
-    color: #fff;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     z-index: 1000;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.5);
+    padding: 1rem 0;
 }
 
-/* Space below the navbar */
-body {
-    padding-top: 70px; /* Adjust this value to match the height of the navbar */
-}
-
-/* Navbar Links */
 .navbar ul {
     list-style-type: none;
     display: flex;
     justify-content: center;
-    padding: 10px 0;
-    margin: 0;
-}
-
-.navbar ul li {
-    margin: 0 15px;
+    gap: 2rem;
 }
 
 .navbar ul li a {
     text-decoration: none;
-    color: #fff;
-    font-weight: 500; /* Slightly bolder font for navbar links */
-    transition: color 0.3s ease;
+    color: #4a5568;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
 }
 
 .navbar ul li a:hover {
-    color: #00bcd4;
+    color: #3182ce;
+    background-color: #ebf8ff;
 }
 
-/* About Me Container */
+/* Main Container */
 #aboutContainer {
-    padding: 20px;
-    max-width: 800px;
-    margin: auto;
-    text-align: center;
-    background-color: #f9f9f9;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
-/* Section Titles */
+/* Section Headings */
 h2, h3 {
-    color: #333;
-    margin-bottom: 20px;
-    font-weight: 600; /* Add weight to titles for emphasis */
+    color: #2d3748;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
 }
 
+h2 {
+    font-size: 2rem;
+    text-align: center;
+}
 
-/* Summary Text Area */
+h3 {
+    font-size: 1.5rem;
+    margin-top: 2rem;
+}
+
+/* Summary Section */
 #summaryText {
     width: 100%;
-    height: 100px;
-    border: 2px solid #ddd;
-    border-radius: 5px;
-    padding: 10px;
-    font-size: 16px;
-    outline: none;
-    resize: none;
-    margin-bottom: 20px;
-    transition: border-color 0.3s ease;
+    height: 120px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+    font-size: 1rem;
+    resize: vertical;
+    transition: all 0.3s ease;
+    margin-bottom: 1rem;
 }
 
 #summaryText:focus {
-    border-color: #00bcd4;
+    border-color: #3182ce;
+    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
 }
 
-/* Displayed Summary */
 #summaryDisplay {
-    margin: 20px auto;
-    padding: 15px;
-    border: 2px solid #333;
-    border-radius: 5px;
-    background-color: #f1f1f1;
-    font-size: 16px;
-    color: #555;
-    font-style: italic;
-    text-align: left;
-    max-width: 700px;
+    margin: 1.5rem auto;
+    padding: 1.5rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background-color: #f8fafc;
+    font-size: 1rem;
+    color: #4a5568;
+    line-height: 1.8;
 }
 
-/* Timeline Input */
+/* Timeline Input Section */
 #timelineInput {
-    margin-top: 20px;
-    text-align: left;
+    background-color: #f8fafc;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1.5rem 0;
 }
 
 #timelineInput input,
 #timelineInput textarea {
-    width: calc(100% - 20px);
-    margin: 10px 0;
-    padding: 10px;
-    border: 2px solid #ddd;
-    border-radius: 5px;
-    font-size: 14px;
-    outline: none;
-    resize: none;
-    transition: border-color 0.3s ease;
+    width: 100%;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
 }
 
 #timelineInput input:focus,
 #timelineInput textarea:focus {
-    border-color: #00bcd4;
-}
-
-/* Add Job Button */
-#addJobButton {
-    background-color: #333;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    font-size: 14px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#addJobButton:hover {
-    background-color: #00bcd4;
+    border-color: #3182ce;
+    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
 }
 
 /* Timeline Display */
 #timelineDisplay {
-    margin: 20px 0;
     position: relative;
+    margin: 3rem 0;
+    padding: 2rem 0;
 }
 
 #timelineDisplay::before {
@@ -148,81 +140,150 @@ h2, h3 {
     top: 0;
     bottom: 0;
     left: 50%;
-    width: 4px;
-    background-color: #ddd;
+    width: 3px;
+    background-color: #e2e8f0;
     transform: translateX(-50%);
-    z-index: 1;
 }
 
 .timeline-entry {
     position: relative;
-    width: 50%;
-    margin-bottom: 20px;
-    padding: 10px;
-    box-sizing: border-box;
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: left;
-    z-index: 2;
+    width: 45%;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.timeline-entry::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    width: 20px;
+    height: 2px;
+    background-color: #e2e8f0;
 }
 
 .timeline-entry:nth-child(odd) {
-    left: 0;
+    float: left;
+    clear: both;
     text-align: right;
 }
 
 .timeline-entry:nth-child(even) {
-    left: 50%;
+    float: right;
+    clear: both;
     text-align: left;
+}
+
+.timeline-entry:nth-child(odd)::before {
+    right: -20px;
+}
+
+.timeline-entry:nth-child(even)::before {
+    left: -20px;
 }
 
 .timeline-entry strong {
     display: block;
-    font-size: 1em;
-    color: #333;
-    margin-bottom: 5px;
+    font-size: 1.1rem;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
 }
 
 .timeline-entry p {
-    margin: 0;
-    font-size: 0.9em;
-    color: #555;
+    color: #4a5568;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
 }
 
-.timeline-entry:nth-child(odd)::after,
-.timeline-entry:nth-child(even)::after {
+.timeline-entry::after {
     content: '';
     position: absolute;
     top: 15px;
-    width: 12px;
-    height: 12px;
-    background-color: #00bcd4;
+    width: 16px;
+    height: 16px;
+    background-color: #3182ce;
+    border: 3px solid #ffffff;
     border-radius: 50%;
-    z-index: 2;
+    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.2);
+    z-index: 1;
 }
 
 .timeline-entry:nth-child(odd)::after {
-    right: -6px;
+    right: -48px;
 }
 
 .timeline-entry:nth-child(even)::after {
-    left: -6px;
+    left: -48px;
 }
 
-/* Save Buttons */
+/* Clear fix for timeline */
+#timelineDisplay::after {
+    content: '';
+    display: table;
+    clear: both;
+}
+
+/* Buttons */
 button {
-    background-color: #333;
-    color: #fff;
+    background-color: #3182ce;
+    color: #ffffff;
     border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-    border-radius: 5px;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    border-radius: 6px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 10px;
+    transition: all 0.3s ease;
 }
 
 button:hover {
-    background-color: #00bcd4;
+    background-color: #2c5282;
+    transform: translateY(-1px);
+}
+
+.delete-job-button {
+    background-color: #e53e3e;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+.delete-job-button:hover {
+    background-color: #c53030;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+    #aboutContainer {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+
+    .timeline-entry {
+        width: calc(100% - 30px);
+        float: right;
+        margin-left: 30px;
+        text-align: left;
+    }
+
+    .timeline-entry:nth-child(odd),
+    .timeline-entry:nth-child(even) {
+        float: right;
+        text-align: left;
+    }
+
+    #timelineDisplay::before {
+        left: 0;
+    }
+
+    .timeline-entry::before {
+        left: -20px !important;
+    }
+
+    .timeline-entry::after {
+        left: -36px !important;
+    }
 }

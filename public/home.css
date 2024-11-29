@@ -1,4 +1,3 @@
-/* Global Styles */
 * {
     margin: 0;
     padding: 0;
@@ -11,10 +10,9 @@
     position: fixed;
     top: 0;
     width: 100%;
-    background-color: #333;
-    color: #fff;
+    background-color: #ffffff;
     z-index: 1000;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.5); /* Add subtle shadow for depth */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .navbar ul {
@@ -27,28 +25,28 @@
 }
 
 .navbar ul li {
-    margin: 0 20px; /* Consistent spacing between links */
+    margin: 0 20px;
 }
 
 .navbar ul li a {
     text-decoration: none;
-    color: #fff;
-    font-weight: 500; /* Medium font weight for readability */
+    color: #4a5568;
+    font-weight: 500;
     font-size: 16px;
-    transition: all 0.3s ease; /* Smooth hover effect */
+    transition: all 0.3s ease;
 }
 
 .navbar ul li a:hover {
-    color: #00bcd4; /* Highlighted color for hover state */
-    text-decoration: underline;
+    color: #3182ce;
+    background-color: #ebf8ff;
 }
 
 /* Container Styling */
 .container {
-    margin-top: 70px; /* Adjusted for navbar height */
-    height: 100vh;
-    background: #222;
-    color: #fff;
+    margin-top: 70px;
+    min-height: 100vh;
+    background: #f5f7fa;
+    color: #2d3748;
     background-size: cover;
     background-position: center;
     position: relative;
@@ -63,11 +61,10 @@
     border: none;
     outline: none;
     background: transparent;
-    color: #fff;
+    color: #2d3748;
     padding: 10px;
     font-size: 16px;
     resize: none;
-    font-family: 'Poppins', sans-serif; /* Ensure font consistency */
 }
 
 #prevText {
@@ -78,8 +75,7 @@
     width: 90%;
     font-size: 32px;
     text-align: center;
-    text-shadow: 2px 2px 20px #000;
-    font-family: 'Poppins', sans-serif; /* Consistent font */
+    color: #2d3748;
 }
 
 /* Upload Icon */
@@ -90,51 +86,156 @@
     left: 50%;
     transform: translateX(-50%);
     cursor: pointer;
-    transition: transform 0.2s ease, opacity 0.3s ease; /* Smooth animation */
+    transition: transform 0.2s ease, opacity 0.3s ease;
 }
 
 .upload-icon:hover {
-    transform: translateX(-50%) scale(1.1); /* Slight zoom on hover */
-    opacity: 0.9; /* Add subtle transparency */
+    transform: translateX(-50%) scale(1.1);
+    opacity: 0.8;
 }
-
 
 .save-btn {
     position: absolute;
-    bottom: 80px; /* Increased from 40px to provide space */
+    bottom: 80px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: #333;
-    color: #fff;
+    background-color: #3182ce;
+    color: #ffffff;
     padding: 10px 20px;
     font-size: 16px;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    transition: all 0.3s ease;
 }
 
 .save-btn:hover {
-    background-color: #00bcd4;
+    background-color: #2563eb;
     transform: translateX(-50%) scale(1.05);
 }
 
 #exportButton {
     position: absolute;
-    bottom: 40px; /* Below the save button */
+    bottom: 40px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: #333;
-    color: #fff;
+    background-color: #3182ce;
+    color: #ffffff;
     padding: 10px 20px;
     font-size: 16px;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    transition: all 0.3s ease;
 }
 
 #exportButton:hover {
-    background-color: #00bcd4;
+    background-color: #2563eb;
     transform: translateX(-50%) scale(1.05);
+}
+
+/* Section Boxes */
+.section-box {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+/* Input Fields */
+input[type="text"],
+input[type="date"],
+textarea {
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: white;
+    color: #2d3748;
+    transition: all 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="date"]:focus,
+textarea:focus {
+    outline: none;
+    border-color: #3182ce;
+    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+/* File Upload Related */
+.upload-container {
+    background-color: white;
+    border: 2px dashed #e2e8f0;
+    border-radius: 8px;
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.upload-container:hover {
+    border-color: #3182ce;
+    background-color: #f7fafc;
+}
+
+.file-info {
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 10px;
+}
+
+/* General Buttons */
+button {
+    background-color: #3182ce;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background-color: #2563eb;
+    transform: scale(1.02);
+}
+
+.delete-btn {
+    background-color: #ef4444;
+}
+
+.delete-btn:hover {
+    background-color: #dc2626;
+}
+
+/* Section Items */
+.education-item,
+.experience-item,
+.skill-item,
+.certification-item {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .navbar ul li {
+        margin: 0 10px;
+    }
+    
+    #prevText {
+        font-size: 24px;
+    }
+    
+    .section-box {
+        padding: 20px;
+    }
 }

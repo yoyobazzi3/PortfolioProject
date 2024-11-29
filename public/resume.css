@@ -1,0 +1,348 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+}
+
+body {
+    padding-top: 70px;
+    background-color: #f5f7fa;
+    color: #2d3748;
+    line-height: 1.6;
+}
+
+/* Navbar Styling */
+/* Navbar Styling */
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    padding: 1rem 0;
+}
+
+.navbar ul {
+    list-style-type: none;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+}
+
+.navbar ul li a {
+    text-decoration: none;
+    color: #4a5568;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+}
+
+.navbar ul li a:hover {
+    color: #3182ce;
+    background-color: #ebf8ff;
+}
+
+
+/* Container */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Section Boxes */
+.section-box {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+/* Headings */
+h1 {
+    color: #1e293b;
+    font-size: 32px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+h2 {
+    color: #1e293b;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+/* File Upload Styling */
+.upload-container {
+    border: 2px dashed #e2e8f0;
+    border-radius: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    background-color: #f8fafc;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.upload-container:hover,
+.upload-container.dragover {
+    border-color: #3182ce;
+    background-color: #f0f7ff;
+}
+
+.file-input {
+    display: none;
+}
+
+.file-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+}
+
+.upload-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+.upload-text {
+    font-size: 18px;
+    color: #1e293b;
+    margin-bottom: 8px;
+}
+
+.upload-hint {
+    font-size: 14px;
+    color: #64748b;
+}
+
+/* File Preview */
+.file-preview {
+    margin-top: 20px;
+}
+
+.file-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background-color: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.file-name {
+    font-size: 16px;
+    color: #1e293b;
+}
+
+.file-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Input Styling */
+input[type="text"],
+textarea {
+    width: 100%;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: white;
+    transition: border-color 0.2s;
+}
+
+input[type="text"]:focus,
+textarea:focus {
+    outline: none;
+    border-color: #3182ce;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* Buttons */
+button {
+    background-color: #3182ce;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+button:hover {
+    background-color: #3182ce;
+    transform: translateY(-1px);
+}
+
+.view-btn {
+    background-color: #3182ce;
+}
+
+.delete-btn {
+    background-color: #ef4444;
+}
+
+.delete-btn:hover {
+    background-color: #dc2626;
+}
+
+/* Section Items */
+.education-item,
+.experience-item,
+.skill-item,
+.certification-item {
+    background-color: #f8fafc;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #e2e8f0;
+}
+
+/* Save Button */
+.save-button {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    font-size: 18px;
+    margin-top: 30px;
+    background-color: #3182ce;
+}
+
+.save-button:hover {
+    background-color: #3182ce;
+}
+
+/* Skills Layout */
+.skill-item {
+    display: grid;
+    grid-template-columns: 2fr 1fr auto;
+    gap: 16px;
+    align-items: start;
+}
+
+.skill-item input {
+    margin-bottom: 0;
+}
+
+.skill-item button {
+    margin-top: 0;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.education-item,
+.experience-item,
+.skill-item,
+.certification-item {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    body {
+        padding-top: 60px;
+    }
+
+    .container {
+        padding: 0 16px;
+    }
+
+    .navbar ul {
+        gap: 30px;
+    }
+
+    .section-box {
+        padding: 20px;
+    }
+
+    .upload-container {
+        padding: 20px;
+    }
+
+    .skill-item {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .skill-item button {
+        margin-top: 10px;
+    }
+
+    .file-info {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .file-actions {
+        width: 100%;
+        justify-content: center;
+    }
+
+    input[type="text"],
+    textarea {
+        font-size: 14px;
+    }
+
+    h1 {
+        font-size: 28px;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+}
+
+/* Print Styles */
+@media print {s
+    .navbar,
+    button,
+    .upload-container,
+    .file-actions {
+        display: none;
+    }
+
+    body {
+        background-color: white;
+        padding-top: 0;
+    }
+
+    .section-box {
+        box-shadow: none;
+        border: none;
+        padding: 20px 0;
+    }
+
+    input[type="text"],
+    textarea {
+        border: none;
+        padding: 0;
+    }
+}
