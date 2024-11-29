@@ -38,14 +38,39 @@ const LogInSchema = new mongoose.Schema({
         default: ''
     },
     timeline: {
-        type: [
-            {
-                date: String, // Could also be Date if preferred
-                title: String,
-                description: String
-            }
-        ],
+        type: [{
+            date: String,
+            title: String,
+            description: String
+        }],
         default: []
+    },
+    // Add resume related fields
+    resume: {
+        fileName: {
+            type: String,
+            default: ''
+        },
+        originalName: {
+            type: String,
+            default: ''
+        },
+        filePath: {
+            type: String,
+            default: ''
+        },
+        uploadDate: {
+            type: Date,
+            default: null
+        },
+        fileSize: {
+            type: Number,
+            default: 0
+        },
+        fileType: {
+            type: String,
+            default: ''
+        }
     }
 });
 
