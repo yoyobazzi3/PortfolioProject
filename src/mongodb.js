@@ -45,7 +45,6 @@ const LogInSchema = new mongoose.Schema({
         }],
         default: []
     },
-    // Add resume related fields
     resume: {
         fileName: {
             type: String,
@@ -74,5 +73,41 @@ const LogInSchema = new mongoose.Schema({
     }
 });
 
-const collection = mongoose.model('Collection1', LogInSchema);
-module.exports = collection;
+// Blog post schema
+const postSchema = new mongoose.Schema({
+    author: {
+        type: String,
+        required: true
+    },
+    title: {
+        type: String,
+        required: true
+    },
+    content: {
+        type: String,
+        required: true
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    likes: {
+        type: Number,
+        default: 0
+    },
+    comments: [{
+        author: String,
+        content: String,
+        createdAt: {
+            type: Date,
+            default: Date.now
+        }
+    }]
+});
+
+// Create models
+const Collection = mongoose.model('Collection1', LogInSchema);
+const Post = mongoose.model('Post', postSchema);
+
+// Export both models
+module.exports = { Collection, Post };
