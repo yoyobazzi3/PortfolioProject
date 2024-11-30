@@ -18,29 +18,44 @@
         </ul>
     </nav>
 
-    <div class="container" id="imgBox">
-        <div id="prevText"></div>
-        <textarea id="textBox" placeholder="Add Caption"></textarea>
+    <div class="container">
+        <!-- Image Container -->
+        <div id="imgBox"></div>
 
-        <input type="file" accept="image/*" name="image" id="file" style="display: none" onchange="loadFile(event)">
-        <label for="file"><img src="images/upload.png" class="upload-icon"></label>
+        <!-- Controls Container -->
+        <div class="controls-container">
+            <!-- Caption Section -->
+            <div class="caption-container">
+                <textarea id="textBox" placeholder="Add Caption" rows="3"></textarea>
+                <div id="prevText"></div>
+            </div>
 
-        <!-- Save button -->
-        <button id="saveButton" class="save-btn">Save</button>
-        <!-- Export button -->
-        <button id="exportButton" class="save-btn">Export to PDF</button>
+            <!-- File Upload Section -->
+            <div class="file-upload-container">
+                <input type="file" accept="image/*" name="image" id="file" style="display: none" onchange="loadFile(event)">
+                <label for="file" class="file-upload-label">Upload Image</label>
+                <div class="selected-file-name" id="fileName"></div>
+            </div>
+
+            <!-- Buttons Section -->
+            <div class="buttons-container">
+                <button id="saveButton">Save</button>
+                <button id="exportButton">Export to PDF</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Extract the username from the URL query parameters
+        // Extract username from URL query parameters
         const queryParams = new URLSearchParams(window.location.search);
         const username = queryParams.get('name');
 
-        // Update navbar links to include the username in query parameters
+        // Update navbar links
         if (username) {
             document.getElementById("homeLink").href = `portfolio?name=${username}`;
             document.getElementById("aboutLink").href = `about?name=${username}`;
             document.getElementById("resumeLink").href = `resume?name=${username}`;
+            document.getElementById("blogLink").href = `blog?name=${username}`;
         }
 
         const textBox = document.getElementById("textBox");
@@ -49,18 +64,34 @@
         const prevText = document.getElementById("prevText");
         const fileInput = document.getElementById("file");
         const exportButton = document.getElementById("exportButton");
+        const fileName = document.getElementById("fileName");
 
-        // Display the typed caption in real-time
+        // Display caption in real-time
         textBox.addEventListener("input", () => {
             prevText.innerText = textBox.value;
         });
 
-        // Update the background image of imgBox when an image is selected
+        // Update image when file is selected
         const loadFile = function(event) {
-            imgBox.style.backgroundImage = "url(" + URL.createObjectURL(event.target.files[0]) + ")";
+            const file = event.target.files[0];
+            if (file) {
+                // Create and set image
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'contain';
+                
+                // Clear previous content and add new image
+                imgBox.innerHTML = '';
+                imgBox.appendChild(img);
+                
+                // Update filename display
+                fileName.textContent = file.name;
+            }
         };
 
-        // Load saved data (caption and image) from server on page load
+        // Load saved data from server
         if (username) {
             fetch(`/api/userdata?name=${username}`)
                 .then(response => response.json())
@@ -73,14 +104,20 @@
                             prevText.innerText = data.caption;
                         }
                         if (data.profileFile) {
-                            imgBox.style.backgroundImage = `url(/uploads/${data.profileFile})`;
+                            const img = document.createElement('img');
+                            img.src = `/uploads/${data.profileFile}`;
+                            img.style.width = '100%';
+                            img.style.height = '100%';
+                            img.style.objectFit = 'contain';
+                            imgBox.innerHTML = '';
+                            imgBox.appendChild(img);
                         }
                     }
                 })
                 .catch(error => console.error('Error fetching user data:', error));
         }
 
-        // Save button click handler to save caption and image
+        // Save button handler
         saveButton.addEventListener("click", () => {
             const formData = new FormData();
             formData.append("username", username);
@@ -105,21 +142,20 @@
             .catch(error => console.error('Error:', error));
         });
 
-        // Export button click handler to export the content as a PDF
+        // Export button handler
         exportButton.addEventListener("click", () => {
             const { jsPDF } = window.jspdf;
 
             html2canvas(imgBox).then(canvas => {
                 const pdf = new jsPDF();
                 const imgData = canvas.toDataURL("image/png");
-
+                
                 pdf.addImage(imgData, "PNG", 10, 10, 190, 0);
                 pdf.save("Portfolio.pdf");
             }).catch(error => {
                 console.error('Error exporting to PDF:', error);
             });
         });
-        
     </script>
 </body>
 </html>
