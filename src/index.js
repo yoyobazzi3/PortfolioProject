@@ -4,7 +4,7 @@ const path = require('path');
 const bcrypt = require('bcrypt');
 const multer = require('multer');
 const fs = require('fs');
-const collection = require('./mongodb');
+const { Collection, Post } = require('./mongodb');
 
 // Configure multer for profile uploads
 const profileStorage = multer.diskStorage({
@@ -19,7 +19,6 @@ const profileStorage = multer.diskStorage({
 // Configure multer for resume uploads
 const resumeStorage = multer.diskStorage({
     destination: function (req, file, cb) {
-        // Create directory if it doesn't exist
         const dir = './public/uploads/resumes';
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir, { recursive: true });
@@ -48,7 +47,7 @@ const profileUpload = multer({ storage: profileStorage });
 const resumeUpload = multer({
     storage: resumeStorage,
     fileFilter: resumeFileFilter,
-    limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
+    limits: { fileSize: 5 * 1024 * 1024 }
 });
 
 // Create uploads directory if it doesn't exist
@@ -61,11 +60,9 @@ if (!fs.existsSync(dir)) {
 const templatePath = path.join(__dirname, '../templates');
 const publicPath = path.join(__dirname, '../public');
 
-// Static file serving
+// Middleware
 app.use(express.static(publicPath));
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
-
-// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -76,6 +73,7 @@ app.get('/login', (req, res) => res.sendFile(path.join(templatePath, 'login.html
 app.get('/portfolio', (req, res) => res.sendFile(path.join(templatePath, 'portfolio.html')));
 app.get('/about', (req, res) => res.sendFile(path.join(templatePath, 'about.html')));
 app.get('/resume', (req, res) => res.sendFile(path.join(templatePath, 'resume.html')));
+app.get('/blog', (req, res) => res.sendFile(path.join(templatePath, 'blog.html')));
 
 // Authentication Routes
 app.post('/signup', profileUpload.single('profileFile'), async (req, res) => {
@@ -88,7 +86,8 @@ app.post('/signup', profileUpload.single('profileFile'), async (req, res) => {
             profileFile: req.file ? req.file.filename : null,
             caption: req.body.caption || ''
         };
-        await collection.insertMany([data]);
+        const newUser = new Collection(data);
+        await newUser.save();
         res.redirect(`/portfolio?name=${req.body.name}`);
     } catch (error) {
         console.error('Error during signup:', error);
@@ -98,7 +97,7 @@ app.post('/signup', profileUpload.single('profileFile'), async (req, res) => {
 
 app.post('/login', async (req, res) => {
     try {
-        const user = await collection.findOne({ name: req.body.name });
+        const user = await Collection.findOne({ name: req.body.name });
         if (user && await bcrypt.compare(req.body.password, user.password)) {
             res.redirect(`/portfolio?name=${user.name}`);
         } else {
@@ -118,8 +117,8 @@ app.post('/upload', profileUpload.single('profileFile'), async (req, res) => {
             profileFile: req.file ? req.file.filename : null,
             caption: req.body.caption || ''
         };
-        await collection.updateOne({ name: req.body.username }, { $set: updateData });
-        const updatedUser = await collection.findOne({ name: req.body.username });
+        await Collection.updateOne({ name: req.body.username }, { $set: updateData });
+        const updatedUser = await Collection.findOne({ name: req.body.username });
         res.json({
             name: updatedUser.name,
             profileFile: updatedUser.profileFile,
@@ -134,7 +133,7 @@ app.post('/upload', profileUpload.single('profileFile'), async (req, res) => {
 app.get('/api/userdata', async (req, res) => {
     const username = req.query.name;
     try {
-        const user = await collection.findOne({ name: username });
+        const user = await Collection.findOne({ name: username });
         if (user) {
             res.json({
                 caption: user.caption,
@@ -153,7 +152,7 @@ app.get('/api/userdata', async (req, res) => {
 app.get('/api/userabout', async (req, res) => {
     const username = req.query.name;
     try {
-        const user = await collection.findOne({ name: username });
+        const user = await Collection.findOne({ name: username });
         if (user) {
             res.json({
                 summary: user.summary || '',
@@ -171,7 +170,7 @@ app.get('/api/userabout', async (req, res) => {
 app.post('/api/saveabout', async (req, res) => {
     try {
         const { username, summary, timeline } = req.body;
-        await collection.updateOne(
+        await Collection.updateOne(
             { name: username },
             { $set: { summary, timeline: JSON.parse(timeline) } },
             { upsert: true }
@@ -190,7 +189,7 @@ app.post('/api/save', profileUpload.single('profileFile'), async (req, res) => {
         if (req.file) {
             updateData.profileFile = req.file.filename;
         }
-        await collection.updateOne({ name: req.body.username }, { $set: updateData });
+        await Collection.updateOne({ name: req.body.username }, { $set: updateData });
         res.json({ success: true });
     } catch (error) {
         console.error('Error saving data:', error);
@@ -202,7 +201,7 @@ app.post('/api/save', profileUpload.single('profileFile'), async (req, res) => {
 app.get('/api/userresume', async (req, res) => {
     const username = req.query.name;
     try {
-        const user = await collection.findOne({ name: username });
+        const user = await Collection.findOne({ name: username });
         if (user) {
             res.json({
                 education: user.education || [],
@@ -220,6 +219,7 @@ app.get('/api/userresume', async (req, res) => {
     }
 });
 
+// Resume Save Route
 app.post('/api/saveresume', async (req, res) => {
     try {
         const { username, education, experience, skills, certifications } = req.body;
@@ -229,7 +229,7 @@ app.post('/api/saveresume', async (req, res) => {
             skills: JSON.parse(skills || '[]'),
             certifications: JSON.parse(certifications || '[]')
         };
-        await collection.updateOne(
+        await Collection.updateOne(
             { name: username },
             { $set: updateData },
             { upsert: true }
@@ -251,7 +251,7 @@ app.post('/api/uploadresume', resumeUpload.single('resume'), async (req, res) =>
         const username = req.body.username;
         const filePath = `/uploads/resumes/${req.file.filename}`;
 
-        await collection.findOneAndUpdate(
+        await Collection.findOneAndUpdate(
             { name: username },
             {
                 $set: {
@@ -277,61 +277,63 @@ app.post('/api/uploadresume', resumeUpload.single('resume'), async (req, res) =>
     }
 });
 
-app.get('/api/getresume/:username', async (req, res) => {
+// Blog Routes
+app.get('/api/posts', async (req, res) => {
     try {
-        const username = req.params.username;
-        const user = await collection.findOne({ name: username });
-        
-        if (!user || !user.resume?.fileName) {
-            return res.status(404).json({ error: 'No resume found' });
-        }
+        const posts = await Post.find().sort({ createdAt: -1 });
+        res.json(posts);
+    } catch (error) {
+        res.status(500).json({ error: 'Error fetching posts' });
+    }
+});
 
-        res.json({
-            success: true,
-            resumePath: user.resume.filePath,
-            originalName: user.resume.originalName,
-            uploadDate: user.resume.uploadDate
+app.post('/api/posts', async (req, res) => {
+    try {
+        const { author, title, content } = req.body;
+        const post = new Post({
+            author,
+            title,
+            content
         });
+        await post.save();
+        res.json({ success: true, post });
     } catch (error) {
-        console.error('Error retrieving resume:', error);
-        res.status(500).json({ error: 'Error retrieving resume' });
+        res.status(500).json({ error: 'Error creating post' });
     }
 });
 
-app.delete('/api/deleteresume/:username', async (req, res) => {
+app.post('/api/posts/:postId/comments', async (req, res) => {
     try {
-        const username = req.params.username;
-        const user = await collection.findOne({ name: username });
+        const { author, content } = req.body;
+        const post = await Post.findById(req.params.postId);
         
-        if (!user || !user.resume?.fileName) {
-            return res.status(404).json({ error: 'No resume found' });
+        if (!post) {
+            return res.status(404).json({ error: 'Post not found' });
         }
 
-        const filePath = path.join(__dirname, '../public', user.resume.filePath);
-        await fs.promises.unlink(filePath);
-
-        await collection.findOneAndUpdate(
-            { name: username },
-            {
-                $set: {
-                    'resume.fileName': '',
-                    'resume.originalName': '',
-                    'resume.filePath': '',
-                    'resume.uploadDate': null,
-                    'resume.fileSize': 0,
-                    'resume.fileType': ''
-                }
-            }
-        );
-
-        res.json({ success: true });
+        post.comments.push({ author, content });
+        await post.save();
+        res.json({ success: true, post });
     } catch (error) {
-        console.error('Error deleting resume:', error);
-        res.status(500).json({ error: 'Error deleting resume' });
+        res.status(500).json({ error: 'Error adding comment' });
     }
 });
 
-// Start server
+app.post('/api/posts/:postId/like', async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.postId);
+        if (!post) {
+            return res.status(404).json({ error: 'Post not found' });
+        }
+        
+        post.likes += 1;
+        await post.save();
+        res.json({ success: true, likes: post.likes });
+    } catch (error) {
+        res.status(500).json({ error: 'Error liking post' });
+    }
+});
+
 const port = 3000;
 app.listen(port, () => {
     console.log(`App listening at http://localhost:${port}`);

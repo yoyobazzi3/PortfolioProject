@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog</title>
+    <link rel="stylesheet" href="blog.css">
+</head>
+<body>
+    <nav class="navbar">
+        <ul>
+            <li><a href="#" id="homeLink">Home</a></li>
+            <li><a href="#" id="aboutLink">About</a></li>
+            <li><a href="#" id="resumeLink">Resume</a></li>
+            <li><a href="#" id="blogLink">Blog</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="create-post">
+            <h2>Create Post</h2>
+            <input type="text" id="postTitle" placeholder="Post Title">
+            <textarea id="postContent" placeholder="Write your post..."></textarea>
+            <button id="submitPost">Post</button>
+        </div>
+
+        <div class="posts-container">
+            <!-- Posts will be loaded here -->
+        </div>
+    </div>
+
+    <template id="post-template">
+        <div class="post">
+            <h3 class="post-title"></h3>
+            <p class="post-author"></p>
+            <p class="post-content"></p>
+            <div class="post-actions">
+                <button class="like-button">👍 <span class="likes-count">0</span></button>
+                <button class="comment-button">💬 Comment</button>
+            </div>
+            <div class="comments-section" style="display: none;">
+                <textarea class="comment-input" placeholder="Write a comment..."></textarea>
+                <button class="submit-comment">Submit</button>
+                <div class="comments-container"></div>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        // Get username from URL
+        const queryParams = new URLSearchParams(window.location.search);
+        const username = queryParams.get('name');
+
+        // Update navbar links
+        if (username) {
+            document.getElementById("homeLink").href = `portfolio?name=${username}`;
+            document.getElementById("aboutLink").href = `about?name=${username}`;
+            document.getElementById("resumeLink").href = `resume?name=${username}`;
+            document.getElementById("blogLink").href = `blog?name=${username}`;
+        }
+
+        // DOM Elements
+        const postsContainer = document.querySelector('.posts-container');
+        const postTemplate = document.getElementById('post-template');
+        const submitPostButton = document.getElementById('submitPost');
+
+        // Load posts
+        async function loadPosts() {
+            try {
+                const response = await fetch('/api/posts');
+                const posts = await response.json();
+                
+                postsContainer.innerHTML = '';
+                posts.forEach(post => {
+                    const postElement = createPostElement(post);
+                    postsContainer.appendChild(postElement);
+                });
+            } catch (error) {
+                console.error('Error loading posts:', error);
+            }
+        }
+
+        // Create post element
+        function createPostElement(post) {
+            const postElement = document.importNode(postTemplate.content, true);
+            
+            postElement.querySelector('.post-title').textContent = post.title;
+            postElement.querySelector('.post-author').textContent = `Posted by ${post.author}`;
+            postElement.querySelector('.post-content').textContent = post.content;
+            postElement.querySelector('.likes-count').textContent = post.likes;
+
+            const postDiv = postElement.querySelector('.post');
+            postDiv.dataset.postId = post._id;
+
+            // Add event listeners
+            postElement.querySelector('.like-button').addEventListener('click', () => likePost(post._id));
+            postElement.querySelector('.comment-button').addEventListener('click', toggleComments);
+            postElement.querySelector('.submit-comment').addEventListener('click', () => submitComment(post._id));
+
+            // Load existing comments
+            const commentsContainer = postElement.querySelector('.comments-container');
+            post.comments?.forEach(comment => {
+                const commentElement = createCommentElement(comment);
+                commentsContainer.appendChild(commentElement);
+            });
+
+            return postElement;
+        }
+
+        // Create comment element
+        function createCommentElement(comment) {
+            const div = document.createElement('div');
+            div.className = 'comment';
+            div.innerHTML = `
+                <p class="comment-author">${comment.author}</p>
+                <p class="comment-content">${comment.content}</p>
+            `;
+            return div;
+        }
+
+        // Toggle comments section
+        function toggleComments(event) {
+            const commentsSection = event.target.closest('.post').querySelector('.comments-section');
+            commentsSection.style.display = commentsSection.style.display === 'none' ? 'block' : 'none';
+        }
+
+        // Submit new post
+        submitPostButton.addEventListener('click', async () => {
+            const title = document.getElementById('postTitle').value;
+            const content = document.getElementById('postContent').value;
+
+            if (!title || !content) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/posts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        author: username,
+                        title,
+                        content
+                    })
+                });
+
+                if (response.ok) {
+                    document.getElementById('postTitle').value = '';
+                    document.getElementById('postContent').value = '';
+                    loadPosts();
+                }
+            } catch (error) {
+                console.error('Error creating post:', error);
+            }
+        });
+
+        // Like post
+        async function likePost(postId) {
+            try {
+                const response = await fetch(`/api/posts/${postId}/like`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    const likesCount = document.querySelector(`[data-post-id="${postId}"] .likes-count`);
+                    likesCount.textContent = data.likes;
+                }
+            } catch (error) {
+                console.error('Error liking post:', error);
+            }
+        }
+
+        // Submit comment
+        async function submitComment(postId) {
+            const post = document.querySelector(`[data-post-id="${postId}"]`);
+            const commentInput = post.querySelector('.comment-input');
+            const content = commentInput.value;
+
+            if (!content) return;
+
+            try {
+                const response = await fetch(`/api/posts/${postId}/comments`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        author: username,
+                        content
+                    })
+                });
+
+                if (response.ok) {
+                    commentInput.value = '';
+                    loadPosts();
+                }
+            } catch (error) {
+                console.error('Error submitting comment:', error);
+            }
+        }
+
+        // Initial load
+        loadPosts();
+    </script>
+</body>
+</html>
