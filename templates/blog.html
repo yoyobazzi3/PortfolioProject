@@ -31,27 +31,68 @@
 
     <template id="post-template">
         <div class="post">
-            <h3 class="post-title"></h3>
-            <p class="post-author"></p>
-            <p class="post-content"></p>
-            <div class="post-actions">
-                <button class="like-button">👍 <span class="likes-count">0</span></button>
-                <button class="comment-button">💬 Comment</button>
+            <div class="post-container">
+                <div class="post-header">
+                    <div class="user-info">
+                        <div class="profile-pic">
+                            <img src="/default-profile.png" alt="Profile Picture">
+                        </div>
+                        <div class="user-meta">
+                            <span class="username"></span>
+                        </div>
+                    </div>
+                    <div class="menu-container" style="display: none;">
+                        <button class="menu-button">•••</button>
+                        <div class="menu-dropdown">
+                            <button class="menu-item delete-post-button">Delete</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="post-content-container">
+                    <h3 class="post-title"></h3>
+                    <p class="post-content"></p>
+                </div>
+                <div class="post-actions">
+                    <button class="like-button">👍 <span class="likes-count">0</span></button>
+                    <button class="comment-button">💬 Comment</button>
+                </div>
+                <div class="comments-section" style="display: none;">
+                    <textarea class="comment-input" placeholder="Write a comment..."></textarea>
+                    <button class="submit-comment">Submit</button>
+                    <div class="comments-container"></div>
+                </div>
             </div>
-            <div class="comments-section" style="display: none;">
-                <textarea class="comment-input" placeholder="Write a comment..."></textarea>
-                <button class="submit-comment">Submit</button>
-                <div class="comments-container"></div>
+        </div>
+    </template>
+
+    <template id="comment-template">
+        <div class="comment">
+            <div class="comment-header">
+                <div class="user-info">
+                    <div class="profile-pic small">
+                        <img src="/default-profile.png" alt="Profile Picture">
+                    </div>
+                    <div class="user-meta">
+                        <span class="username"></span>
+                    </div>
+                </div>
+                <div class="menu-container" style="display: none;">
+                    <button class="menu-button">•••</button>
+                    <div class="menu-dropdown">
+                        <button class="menu-item delete-comment-button">Delete</button>
+                    </div>
+                </div>
+            </div>
+            <div class="comment-content-container">
+                <p class="comment-content"></p>
             </div>
         </div>
     </template>
 
     <script>
-        // Get username from URL
         const queryParams = new URLSearchParams(window.location.search);
         const username = queryParams.get('name');
 
-        // Update navbar links
         if (username) {
             document.getElementById("homeLink").href = `portfolio?name=${username}`;
             document.getElementById("aboutLink").href = `about?name=${username}`;
@@ -59,72 +100,148 @@
             document.getElementById("blogLink").href = `blog?name=${username}`;
         }
 
-        // DOM Elements
         const postsContainer = document.querySelector('.posts-container');
         const postTemplate = document.getElementById('post-template');
+        const commentTemplate = document.getElementById('comment-template');
         const submitPostButton = document.getElementById('submitPost');
 
-        // Load posts
+        async function updateProfilePic(element, username) {
+            try {
+                const response = await fetch(`/api/userdata?name=${username}`);
+                const data = await response.json();
+                if (data.profileFile) {
+                    element.querySelector('img').src = `/uploads/${data.profileFile}`;
+                }
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+            }
+        }
+
         async function loadPosts() {
             try {
                 const response = await fetch('/api/posts');
                 const posts = await response.json();
                 
                 postsContainer.innerHTML = '';
-                posts.forEach(post => {
+                for (const post of posts) {
                     const postElement = createPostElement(post);
                     postsContainer.appendChild(postElement);
-                });
+                }
             } catch (error) {
                 console.error('Error loading posts:', error);
             }
         }
 
-        // Create post element
         function createPostElement(post) {
             const postElement = document.importNode(postTemplate.content, true);
             
             postElement.querySelector('.post-title').textContent = post.title;
-            postElement.querySelector('.post-author').textContent = `Posted by ${post.author}`;
+            const usernameSpan = postElement.querySelector('.username');
+            usernameSpan.textContent = post.author;
             postElement.querySelector('.post-content').textContent = post.content;
             postElement.querySelector('.likes-count').textContent = post.likes;
 
             const postDiv = postElement.querySelector('.post');
             postDiv.dataset.postId = post._id;
 
-            // Add event listeners
+            updateProfilePic(postDiv.querySelector('.user-info'), post.author);
+
+            if (post.author === username) {
+                const menuContainer = postDiv.querySelector('.menu-container');
+                menuContainer.style.display = 'block';
+                const menuButton = menuContainer.querySelector('.menu-button');
+                const menuDropdown = menuContainer.querySelector('.menu-dropdown');
+                
+                menuButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    menuDropdown.classList.toggle('active');
+                });
+
+                menuContainer.querySelector('.delete-post-button').addEventListener('click', () => deletePost(post._id));
+            }
+
             postElement.querySelector('.like-button').addEventListener('click', () => likePost(post._id));
             postElement.querySelector('.comment-button').addEventListener('click', toggleComments);
             postElement.querySelector('.submit-comment').addEventListener('click', () => submitComment(post._id));
 
-            // Load existing comments
             const commentsContainer = postElement.querySelector('.comments-container');
             post.comments?.forEach(comment => {
-                const commentElement = createCommentElement(comment);
+                const commentElement = createCommentElement(comment, post._id);
                 commentsContainer.appendChild(commentElement);
             });
 
             return postElement;
         }
 
-        // Create comment element
-        function createCommentElement(comment) {
-            const div = document.createElement('div');
-            div.className = 'comment';
-            div.innerHTML = `
-                <p class="comment-author">${comment.author}</p>
-                <p class="comment-content">${comment.content}</p>
-            `;
-            return div;
+        function createCommentElement(comment, postId) {
+            const commentElement = document.importNode(commentTemplate.content, true);
+            
+            const usernameSpan = commentElement.querySelector('.username');
+            usernameSpan.textContent = comment.author;
+            
+            commentElement.querySelector('.comment-content').textContent = comment.content;
+            
+            const commentDiv = commentElement.querySelector('.comment');
+            commentDiv.dataset.commentId = comment._id;
+
+            updateProfilePic(commentDiv.querySelector('.user-info'), comment.author);
+
+            if (comment.author === username) {
+                const menuContainer = commentDiv.querySelector('.menu-container');
+                menuContainer.style.display = 'block';
+                const menuButton = menuContainer.querySelector('.menu-button');
+                const menuDropdown = menuContainer.querySelector('.menu-dropdown');
+                
+                menuButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    menuDropdown.classList.toggle('active');
+                });
+
+                menuContainer.querySelector('.delete-comment-button').addEventListener('click', () => deleteComment(postId, comment._id));
+            }
+
+            return commentElement;
         }
 
-        // Toggle comments section
+        async function deletePost(postId) {
+            if (!confirm('Are you sure you want to delete this post?')) return;
+
+            try {
+                const response = await fetch(`/api/posts/${postId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    const postElement = document.querySelector(`[data-post-id="${postId}"]`);
+                    postElement.remove();
+                }
+            } catch (error) {
+                console.error('Error deleting post:', error);
+            }
+        }
+
+        async function deleteComment(postId, commentId) {
+            if (!confirm('Are you sure you want to delete this comment?')) return;
+
+            try {
+                const response = await fetch(`/api/posts/${postId}/comments/${commentId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    const commentElement = document.querySelector(`[data-comment-id="${commentId}"]`);
+                    commentElement.remove();
+                }
+            } catch (error) {
+                console.error('Error deleting comment:', error);
+            }
+        }
+
         function toggleComments(event) {
             const commentsSection = event.target.closest('.post').querySelector('.comments-section');
             commentsSection.style.display = commentsSection.style.display === 'none' ? 'block' : 'none';
         }
 
-        // Submit new post
         submitPostButton.addEventListener('click', async () => {
             const title = document.getElementById('postTitle').value;
             const content = document.getElementById('postContent').value;
@@ -157,7 +274,15 @@
             }
         });
 
-        // Like post
+        document.addEventListener('click', (event) => {
+            const dropdowns = document.querySelectorAll('.menu-dropdown.active');
+            dropdowns.forEach(dropdown => {
+                if (!dropdown.parentElement.contains(event.target)) {
+                    dropdown.classList.remove('active');
+                }
+            });
+        });
+
         async function likePost(postId) {
             try {
                 const response = await fetch(`/api/posts/${postId}/like`, {
@@ -174,7 +299,6 @@
             }
         }
 
-        // Submit comment
         async function submitComment(postId) {
             const post = document.querySelector(`[data-post-id="${postId}"]`);
             const commentInput = post.querySelector('.comment-input');
@@ -203,7 +327,6 @@
             }
         }
 
-        // Initial load
         loadPosts();
     </script>
 </body>
