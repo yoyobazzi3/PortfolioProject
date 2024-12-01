@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+module.exports = app;
 const path = require('path');
 const bcrypt = require('bcrypt');
 const multer = require('multer');
