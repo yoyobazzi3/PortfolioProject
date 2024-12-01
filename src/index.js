@@ -334,6 +334,38 @@ app.post('/api/posts/:postId/like', async (req, res) => {
     }
 });
 
+// Delete post
+app.delete('/api/posts/:postId', async (req, res) => {
+    try {
+        const post = await Post.findByIdAndDelete(req.params.postId);
+        if (!post) {
+            return res.status(404).json({ error: 'Post not found' });
+        }
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ error: 'Error deleting post' });
+    }
+});
+
+// Delete comment
+app.delete('/api/posts/:postId/comments/:commentId', async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.postId);
+        if (!post) {
+            return res.status(404).json({ error: 'Post not found' });
+        }
+        
+        post.comments = post.comments.filter(
+            comment => comment._id.toString() !== req.params.commentId
+        );
+        
+        await post.save();
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ error: 'Error deleting comment' });
+    }
+});
+
 const port = 3000;
 app.listen(port, () => {
     console.log(`App listening at http://localhost:${port}`);
