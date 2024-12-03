@@ -139,6 +139,4 @@ describe('Express App Tests', () => {
             expect(res.body.success).toBe(true);
         });
     });
-
-    
 });

@@ -70,6 +70,38 @@ const LogInSchema = new mongoose.Schema({
             type: String,
             default: ''
         }
+    },
+    education: {
+        type: [{
+            school: String,
+            degree: String,
+            year: String
+        }],
+        default: []
+    },
+    experience: {
+        type: [{
+            company: String,
+            position: String,
+            duration: String,
+            description: String
+        }],
+        default: []
+    },
+    skills: {
+        type: [{
+            name: String,
+            level: String
+        }],
+        default: []
+    },
+    certifications: {
+        type: [{
+            name: String,
+            issuer: String,
+            year: String
+        }],
+        default: []
     }
 });
 
