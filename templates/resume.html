@@ -65,6 +65,12 @@
         </section>
 
         <button onclick="saveResume()" class="save-button">Save Resume</button>
+        <section id="resume-display" class="section-box">
+            <h2>Resume Overview</h2>
+            <div id="resume-overview" class="resume-overview">
+                
+            </div>
+        </section>
     </div>
 
     <script>
@@ -357,6 +363,119 @@
             document.getElementById('resume-file').files = dt.files;
             handleFileUpload({ target: { files: [file] } });
         }, false);
+
+        function displayResumeOverview(data) {
+    const overviewDiv = document.getElementById('resume-overview');
+    overviewDiv.innerHTML = `
+        <h3>Education</h3>
+        <ul>
+            ${data.education.map(edu => `
+                <li>${edu.school} - ${edu.degree} (${edu.year})</li>
+            `).join('')}
+        </ul>
+        <h3>Work Experience</h3>
+        <ul>
+            ${data.experience.map(exp => `
+                <li>${exp.company} - ${exp.position} (${exp.duration})<br>${exp.description}</li>
+            `).join('')}
+        </ul>
+        <h3>Skills</h3>
+        <ul>
+            ${data.skills.map(skill => `
+                <li>${skill.name} (${skill.level})</li>
+            `).join('')}
+        </ul>
+        <h3>Certifications</h3>
+        <ul>
+            ${data.certifications.map(cert => `
+                <li>${cert.name} - ${cert.issuer} (${cert.year})</li>
+            `).join('')}
+        </ul>
+    `;
+}
+
+// Modify saveResume() to update the display after saving
+async function saveResume() {
+    const educationItems = Array.from(document.querySelectorAll('.education-item')).map(item => ({
+        school: item.querySelector('.school').value,
+        degree: item.querySelector('.degree').value,
+        year: item.querySelector('.year').value,
+    }));
+
+    const experienceItems = Array.from(document.querySelectorAll('.experience-item')).map(item => ({
+        company: item.querySelector('.company').value,
+        position: item.querySelector('.position').value,
+        duration: item.querySelector('.duration').value,
+        description: item.querySelector('.description').value,
+    }));
+
+    const skillItems = Array.from(document.querySelectorAll('.skill-item')).map(item => ({
+        name: item.querySelector('.skill-name').value,
+        level: item.querySelector('.skill-level').value,
+    }));
+
+    const certificationItems = Array.from(document.querySelectorAll('.certification-item')).map(item => ({
+        name: item.querySelector('.cert-name').value,
+        issuer: item.querySelector('.cert-issuer').value,
+        year: item.querySelector('.cert-year').value,
+    }));
+
+    try {
+        const response = await fetch('/api/saveresume', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username,
+                education: JSON.stringify(educationItems),
+                experience: JSON.stringify(experienceItems),
+                skills: JSON.stringify(skillItems),
+                certifications: JSON.stringify(certificationItems),
+            }),
+        });
+
+        if (response.ok) {
+            alert('Resume saved successfully!');
+            const updatedData = { education: educationItems, experience: experienceItems, skills: skillItems, certifications: certificationItems };
+            displayResumeOverview(updatedData);
+        } else {
+            alert('Error saving resume');
+        }
+    } catch (error) {
+        console.error('Error saving resume:', error);
+        alert('Error saving resume');
+    }
+}
+
+// Load data when the page loads and display it
+async function loadResumeData() {
+    try {
+        const response = await fetch(`/api/userresume?name=${username}`);
+        const data = await response.json();
+
+        if (data.education) {
+            data.education.forEach(edu => displayEducation(edu));
+        }
+        if (data.experience) {
+            data.experience.forEach(exp => displayExperience(exp));
+        }
+        if (data.skills) {
+            data.skills.forEach(skill => displaySkill(skill));
+        }
+        if (data.certifications) {
+            data.certifications.forEach(cert => displayCertification(cert));
+        }
+        if (data.resume?.filePath) {
+            displayUploadedFile(data.resume.filePath, data.resume.originalName);
+        }
+
+        // Display all loaded data at the bottom
+        displayResumeOverview(data);
+    } catch (error) {
+        console.error('Error loading resume data:', error);
+    }
+}
     </script>
 </body>
 </html>
