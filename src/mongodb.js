@@ -71,7 +71,7 @@ const LogInSchema = new mongoose.Schema({
             default: ''
         }
     },
-    education: {
+        education: {
         type: [{
             school: String,
             degree: String,

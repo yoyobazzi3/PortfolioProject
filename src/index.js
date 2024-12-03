@@ -277,6 +277,36 @@ app.post('/api/uploadresume', resumeUpload.single('resume'), async (req, res) =>
         res.status(500).json({ error: 'Error uploading file' });
     }
 });
+app.delete('/api/deleteresume/:username', async (req, res) => {
+    try {
+        const username = req.params.username;
+
+        // Find the user in the database
+        const user = await Collection.findOne({ name: username });
+
+        if (!user || !user.resume || !user.resume.filePath) {
+            return res.status(404).json({ error: 'Resume not found' });
+        }
+
+        // Delete the file from the server
+        const filePath = path.join(__dirname, '../public', user.resume.filePath);
+        if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath); // Deletes the file
+        }
+
+        // Remove resume information from the database
+        await Collection.updateOne(
+            { name: username },
+            { $unset: { resume: '' } } // Removes the `resume` field
+        );
+
+        res.json({ success: true, message: 'Resume deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting resume:', error);
+        res.status(500).json({ error: 'Error deleting resume' });
+    }
+});
+
 
 // Blog Routes
 app.get('/api/posts', async (req, res) => {

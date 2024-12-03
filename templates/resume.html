@@ -130,26 +130,27 @@
         }
 
         async function deleteResumeFile() {
-            if (!confirm('Are you sure you want to delete this resume?')) return;
+    if (!confirm('Are you sure you want to delete this resume?')) return;
 
-            try {
-                const response = await fetch(`/api/deleteresume/${username}`, {
-                    method: 'DELETE'
-                });
+    try {
+        const response = await fetch(`/api/deleteresume/${username}`, {
+            method: 'DELETE',
+        });
 
-                if (response.ok) {
-                    document.getElementById('file-preview').innerHTML = '';
-                    document.getElementById('resume-file').value = '';
-                    alert('Resume deleted successfully!');
-                } else {
-                    const error = await response.json();
-                    alert(error.error || 'Error deleting resume');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error deleting file');
-            }
+        if (response.ok) {
+            document.getElementById('file-preview').innerHTML = '';
+            document.getElementById('resume-file').value = '';
+            alert('Resume deleted successfully!');
+        } else {
+            const error = await response.json();
+            alert(error.error || 'Error deleting resume');
         }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error deleting file');
+    }
+}
+
 
         // Your existing resume functions (addEducation, addExperience, etc.)
         function addEducation() {
